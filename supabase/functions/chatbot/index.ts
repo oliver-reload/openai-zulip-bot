@@ -25,7 +25,7 @@ async function imagePrompt(openai, prompt: string) {
   console.log('openAI response:');
   console.log(response);
 
-  return response;
+  return response?.data[0]?.url;
 }
 
 async function returnError(message) {
