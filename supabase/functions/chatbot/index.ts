@@ -60,7 +60,7 @@ serve(async (req) => {
 
   // If the bot has been initialized by calling it's name,
   // we'll remove it from the prompt.
-  const botName = '@**OpenAi**';
+  const botName = '@**ChatGPT3**';
 
   if (prompt.startsWith(botName)) {
     prompt = prompt.replace(botName, "", 1)
@@ -71,9 +71,9 @@ serve(async (req) => {
   console.log('Prompt: ' + prompt);
 
   if (prompt.startsWith('--image')) {
-    response = await imagePrompt(openai, prompt);
+    const image_url = await imagePrompt(openai, prompt);
 
-    response += '\r\n (The image URL will expire after a while)'
+    response += '[Notice: The image URL will expire after a while](' + image_url + ')'
   }
   else {
     response = await textPrompt(openai, prompt);
