@@ -66,6 +66,8 @@ serve(async (req) => {
     prompt = prompt.replace(botName, "", 1)
   }
 
+  prompt = prompt.trim();
+
   console.log('Prompt: ' + prompt);
 
   if (prompt.startsWith('--image')) {
