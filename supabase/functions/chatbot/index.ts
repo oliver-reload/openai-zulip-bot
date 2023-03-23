@@ -1,23 +1,26 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { OpenAI } from "https://deno.land/x/openai_mini/mod.ts";
+import { OpenAI } from "https://deno.land/x/openai/mod.ts";
 
 async function textPrompt(openai, prompt: string) {
-  const response = await openai.createCompletion({
-    model: "text-davinci-003",
-    prompt: `${prompt}`,
-    max_tokens: 500,
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      // Definining the 'personality' of the AI.
+      {"role": "system", "content": "You are a sassy, impatient assistant, who is not afraid to swear."},
+      {"role": "user", "content": prompt},
+    ],
+    max_tokens: 1000,
   });
 
   console.log('openAI response:');
   console.log(response);
 
-  return response?.choices[0]?.text;
+  return response?.choices[0]?.message?.content;
 }
 
 async function imagePrompt(openai, prompt: string) {
   const response = await openai.createImage({
     prompt: `${prompt}`,
-    n: 1,
     size: "512x512",
     response_format: "url"
   });
@@ -60,7 +63,7 @@ serve(async (req) => {
 
   // If the bot has been initialized by calling it's name,
   // we'll remove it from the prompt.
-  const botName = '@**ChatGPT3**';
+  const botName = '@**OpenAI**';
 
   if (prompt.startsWith(botName)) {
     prompt = prompt.replace(botName, "", 1)
