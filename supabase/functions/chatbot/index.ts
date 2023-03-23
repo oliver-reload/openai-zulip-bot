@@ -1,15 +1,41 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { OpenAI } from "https://deno.land/x/openai/mod.ts";
 
-async function textPrompt(openai, prompt: string) {
+async function textPrompt(openai, prompt: string, sender_name: string, sender_email: string) {
+  let personality = 'You are a sassy, impatient assistant, who is not afraid to swear.'
+  console.log(sender_name);
+  console.log(sender_email);
+
+  switch (sender_email) {
+    case 'benjamin@reload.dk':
+      personality = 'An extremely sweet, humble and friendly assistant, who replies only in limericks.';
+      break;
+
+    case 'oliver@reload.dk':
+      personality = 'An ultra-aggressive counter-assistant, who refuses to answer any questions.'; 
+      break;
+
+    case 'rasmus@reload.dk':
+      personality = 'Michael Scott from The Office. You are very confident, but very rarely correct in your statements.';
+      break;
+
+    case 'robert@reload.dk':
+      personality = 'an 18th century pirate';
+      break;
+
+    case 'jacob@reload.dk':
+      personality = 'Patrick from Spongebob Squarepants'
+      break;
+  }
+
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
     messages: [
       // Definining the 'personality' of the AI.
-      {"role": "system", "content": "You are a sassy, impatient assistant, who is not afraid to swear."},
+      {"role": "system", "content": "You are talking to " + sender_name + ". You are taking the personality of " + personality},
       {"role": "user", "content": prompt},
     ],
-    max_tokens: 1000,
+    max_tokens: 300,
   });
 
   console.log('openAI response:');
@@ -50,7 +76,7 @@ serve(async (req) => {
   }
   
   const openai = new OpenAI(openAIAPIKey);
-  const { data } = await req.json()
+  const { data, message } = await req.json()
 
   let prompt = data.toString();
   let response = '';
@@ -79,7 +105,11 @@ serve(async (req) => {
     response += '[Notice: The image URL will expire after a while](' + image_url + ')'
   }
   else {
-    response = await textPrompt(openai, prompt);
+    const email = message?.sender_email;
+    const name = message?.sender_full_name;
+
+    console.log(message);
+    response = await textPrompt(openai, prompt, name, email);
   }
 
   console.log('Response: ' + response);
